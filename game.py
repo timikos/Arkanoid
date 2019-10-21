@@ -1,5 +1,5 @@
 import random
-from math import cos, sin, radians, sqrt
+from math import cos, sin, radians
 
 import pygame
 import sys
@@ -95,7 +95,8 @@ class Platform:
                 self.x += 2
 
     def collides_with_circle(self, rect):
-        return pygame.rect.colliderect(rect)
+        pass
+        # return pygame.rect.colliderect(rect)
 
 
 def main():
