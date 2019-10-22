@@ -1,5 +1,6 @@
 import random
 from math import cos, sin, radians
+import time
 
 import pygame
 import sys
@@ -70,6 +71,8 @@ class LinearMovingBall(Ball):
         self.shift_x, other_ball.shift_x = other_ball.shift_x, self.shift_x
         self.shift_y, other_ball.shift_y = other_ball.shift_y, self.shift_y
 
+
+
 class Platform:
     def __init__(self, x = width // 2, y = height // 2 + 100):
         self.x = x
@@ -93,15 +96,17 @@ def main():
     global size
     current_shift = 0
     pygame.init()
+    pygame.font.init()
     screen = pygame.display.set_mode(size, pygame.RESIZABLE)
-
+    font = pygame.font.SysFont('Comic Sans MS', 100, True)
+    ts = font.render("", False, (255, 255, 255))
     # objects = []
     # for i in range(5):
     #     objects.append(LinearMovingBall(width, height))
 
     ball = LinearMovingBall(width, height)
     plat = Platform()
-
+    flag_stop_platform = False # Флаг для остановки платформы после проигрыша
     game_over = False
     while not game_over:
         for event in pygame.event.get():
@@ -110,7 +115,7 @@ def main():
             elif event.type == pygame.VIDEORESIZE:
                 size = width, height = event.w, event.h
                 screen = pygame.display.set_mode(size, pygame.RESIZABLE)
-            elif event.type == pygame.KEYDOWN:
+            elif event.type == pygame.KEYDOWN and flag_stop_platform == False:
                 if chr(event.key) == 'a':
                     current_shift = -1
                 elif chr(event.key) == 'd':
@@ -118,6 +123,12 @@ def main():
             elif event.type == pygame.KEYUP:
                 if event.key in [97, 100]:
                     current_shift = 0
+
+        if ball.rect.y == height - 100:
+            ts = font.render("Game Over", False, (255, 255, 255))
+            ball.shift_y, ball.shift_x = 0, 0
+            flag_stop_platform = True
+
 
         plat.process_logic(current_shift)
         ball.process_logic()
@@ -134,10 +145,15 @@ def main():
 
         # for item in objects:
         #     item.process_draw(screen)
+        screen.blit(ts, (125,200))
         ball.process_draw(screen)
         plat.process_draw(screen, (0,255,100))
         pygame.display.flip()
         pygame.time.wait(10)
+
+        if flag_stop_platform:
+            time.sleep(2)
+            game_over = True
 
 
     sys.exit()
