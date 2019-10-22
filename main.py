@@ -51,7 +51,7 @@ class LinearMovingBall(Ball):
         self.window_width = window_width
         self.window_height = window_height
         self.rect.x = random.randint(10, self.window_width - self.rect.width - 10)
-        self.rect.y = random.randint(10, self.window_height - self.rect.height - 10)
+        self.rect.y = random.randint(10, 200)
         self.shift_x = 1 if random.randint(0, 1) == 1 else -1
         self.shift_y = 1 if random.randint(0, 1) == 1 else -1
 
@@ -64,7 +64,7 @@ class LinearMovingBall(Ball):
             self.shift_y *= -1
 
     def collides_with_plat(self, platform):
-        if platform.y <= self.rect.y + 100 and (self.rect.x >= platform.x - 50 and self.rect.x <= platform.x + 100):
+        if platform.y == self.rect.y + 100 and (self.rect.x >= platform.x - 50 and self.rect.x <= platform.x + 100):
             return True
 
     def collision(self, other_ball):
@@ -100,11 +100,10 @@ def main():
     screen = pygame.display.set_mode(size, pygame.RESIZABLE)
     font = pygame.font.SysFont('Comic Sans MS', 100, True)
     ts = font.render("", False, (255, 255, 255))
-    # objects = []
-    # for i in range(5):
-    #     objects.append(LinearMovingBall(width, height))
+    objects = []
+    for i in range(3):
+        objects.append(LinearMovingBall(width, height))
 
-    ball = LinearMovingBall(width, height)
     plat = Platform()
     flag_stop_platform = False # Флаг для остановки платформы после проигрыша
     game_over = False
@@ -123,30 +122,27 @@ def main():
             elif event.type == pygame.KEYUP:
                 if event.key in [97, 100]:
                     current_shift = 0
-
-        if ball.rect.y == height - 100:
-            ts = font.render("Game Over", False, (255, 255, 255))
-            ball.shift_y, ball.shift_x = 0, 0
-            flag_stop_platform = True
+        for item in objects:
+            if item.rect.y == height - 100:
+                ts = font.render("Game Over", False, (255, 255, 255))
+                item.shift_y, item.shift_x = 0, 0
+                flag_stop_platform = True
 
 
         plat.process_logic(current_shift)
-        ball.process_logic()
-        # for item in objects:
-        #     item.process_logic()
+        for item in objects:
+            item.process_logic()
 
-        # for i in range(len(objects)):
-        #     if objects[i].collides_with_plat(plat):
-        #         objects[i].shift_y = -1
-        if ball.collides_with_plat(plat):
-            ball.shift_y = -1
+        for item in objects:
+            if item.collides_with_plat(plat):
+                item.shift_y = -1
+
 
         screen.fill(black)
 
-        # for item in objects:
-        #     item.process_draw(screen)
+        for item in objects:
+            item.process_draw(screen)
         screen.blit(ts, (125,200))
-        ball.process_draw(screen)
         plat.process_draw(screen, (0,255,100))
         pygame.display.flip()
         pygame.time.wait(10)
