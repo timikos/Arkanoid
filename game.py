@@ -30,7 +30,6 @@ class Ball:
 
 
 class MovingBall(Ball):
-
     def __init__(self, c_x=200, c_y=200, c_r=150, c_delta=5):
         super().__init__()
         self.center_x = c_x
@@ -63,16 +62,9 @@ class LinearMovingBall(Ball):
         if self.rect.top <= 0 or self.rect.bottom >= self.window_height:
             self.shift_y *= -1
 
-    # def collides_with_plat(self, platform):
-    #     x_circle = self.rect.x
-    #     y_circle = self.rect.y
-    #     x_platform = [platform.x - 50, platform.x + 50]
-    #     y_platform = platform.y
-    #     if y_platform >= y_circle + 100 and x_circle + 50 == range(x_platform[0], x_platform[1]):
-    #         return True
-
-
-        # return pygame.sprite.collide_circle(self, platform)
+    def collides_with_plat(self, platform):
+        if platform.y <= self.rect.y + 100 and (self.rect.x >= platform.x - 50 and self.rect.x <= platform.x + 100):
+            return True
 
     def collision(self, other_ball):
         self.shift_x, other_ball.shift_x = other_ball.shift_x, self.shift_x
@@ -94,10 +86,6 @@ class Platform:
             if self.x <= width - 100:
                 self.x += 2
 
-    def collides_with_circle(self, rect):
-        pass
-        # return pygame.rect.colliderect(rect)
-
 
 def main():
     global width
@@ -107,10 +95,11 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode(size, pygame.RESIZABLE)
 
-    objects = []
-    for i in range(5):
-        objects.append(LinearMovingBall(width, height))
+    # objects = []
+    # for i in range(5):
+    #     objects.append(LinearMovingBall(width, height))
 
+    ball = LinearMovingBall(width, height)
     plat = Platform()
 
     game_over = False
@@ -130,20 +119,22 @@ def main():
                 if event.key in [97, 100]:
                     current_shift = 0
 
-
         plat.process_logic(current_shift)
-        for item in objects:
-            item.process_logic()
-        for i in range(len(objects)):
-            if plat.collides_with_circle(objects[i]):
-                print('collision')
-                del objects[0]
+        ball.process_logic()
+        # for item in objects:
+        #     item.process_logic()
 
+        # for i in range(len(objects)):
+        #     if objects[i].collides_with_plat(plat):
+        #         objects[i].shift_y = -1
+        if ball.collides_with_plat(plat):
+            ball.shift_y = -1
 
         screen.fill(black)
 
-        for item in objects:
-            item.process_draw(screen)
+        # for item in objects:
+        #     item.process_draw(screen)
+        ball.process_draw(screen)
         plat.process_draw(screen, (0,255,100))
         pygame.display.flip()
         pygame.time.wait(10)
